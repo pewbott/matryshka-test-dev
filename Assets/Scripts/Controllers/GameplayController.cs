@@ -12,6 +12,7 @@ namespace CookingPrototype.Controllers {
 		public static GameplayController Instance { get; private set; }
 
 		public GameObject TapBlock   = null;
+		public StartWindow StartWindow = null;
 		public WinWindow  WinWindow  = null;
 		public LoseWindow LoseWindow = null;
 
@@ -23,6 +24,8 @@ namespace CookingPrototype.Controllers {
 			set {
 				_ordersTarget = value;
 				TotalOrdersServedChanged?.Invoke();
+				Time.timeScale = 0f;
+				StartWindow.Show();
 			}
 		}
 
@@ -99,6 +102,11 @@ namespace CookingPrototype.Controllers {
 #else
 			Application.Quit();
 #endif
+		}
+
+		public void StartGame() {
+			Time.timeScale = Time.timeScale = 1f;
+			StartWindow.Hide();
 		}
 	}
 }

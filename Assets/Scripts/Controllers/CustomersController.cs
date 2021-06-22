@@ -139,7 +139,52 @@ namespace CookingPrototype.Controllers {
 		/// <param name="order">Заказ, который пытаемся отдать</param>
 		/// <returns>Флаг - результат, удалось ли успешно отдать заказ</returns>
 		public bool ServeOrder(Order order) {
-			throw  new NotImplementedException("ServeOrder: this feature is not implemented.");
+
+			List<CustomerOrderPlace> customerOrderPlacesList = new List<CustomerOrderPlace>();
+			customerOrderPlacesList.AddRange(FindObjectsOfType<CustomerOrderPlace>());
+			var neededOrders = customerOrderPlacesList.FindAll(x => x.CurOrder == order);
+
+			List<Customer> customersList = new List<Customer>();
+			customersList.AddRange(FindObjectsOfType<Customer>());
+			List<Customer> customersWithNeededOrderList = new List<Customer>();
+
+			if ( neededOrders.Count == 0 )
+				return false;
+			else {
+				for(int i = 0; i < customersList.Count; i++ ) {
+					for(int j = 0; j < customersList[i].OrderPlaces.Count; j++) {
+						if(neededOrders.IndexOf(customersList[i].OrderPlaces[j]) >= 0) {
+							if(customersWithNeededOrderList.IndexOf(customersList[i]) <0) {
+								customersWithNeededOrderList.Add(customersList[i]);
+							}
+						}
+					}
+				}
+			}
+
+			List<float> waitWaitTimeList = new List<float>();
+			for(int i = 0; i < customersWithNeededOrderList.Count; i++ ) {
+				waitWaitTimeList.Add(customersWithNeededOrderList[i].WaitTime);
+			}
+
+			var index = waitWaitTimeList.IndexOf(waitWaitTimeList.Min());
+
+			customersWithNeededOrderList[index].ServeOrder(order);
+
+			if ( customersWithNeededOrderList[index].IsComplete )
+				FreeCustomer(customersWithNeededOrderList[index]);
+
+			/*
+			for(int i =0; i < neededOrders.Count; i++) {
+				Debug.Log(neededOrders[i].name);
+			}
+			*/
+
+
+
+			return true;
+
+			//throw  new NotImplementedException("ServeOrder: this feature is not implemented.");
 		}
 	}
 }
